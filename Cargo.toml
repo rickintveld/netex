@@ -6,3 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = "0.4.24"
+dotenvy = "0.15.6"
+flate2 = "1.0.25"
+ftp = "3.0.1"
+regex = "1.8.0"
+serde-xml-rs = "0.6.0"
+tar = "0.4.38"
