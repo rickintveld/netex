@@ -6,19 +6,14 @@ use std::fs::{self, File};
 use std::io::{prelude::*, Cursor};
 use std::path::Path;
 
+use crate::service::ftp_stream;
 use crate::types::connection::FtpConnection;
 
-pub fn download(ftp_connection: FtpConnection) -> Vec<File> {
+pub fn download(ftp_stream: &mut FtpStream, ftp_connection: FtpConnection) -> Vec<File> {
     let file_regex = Regex::new(&ftp_connection.regex).unwrap();
     let date_regex = Regex::new(r"(\d{8})_(\d{8})").unwrap();
 
-    let mut ftp_stream = connect(&ftp_connection);
-
-    login(&mut ftp_stream, &ftp_connection);
-
-    change_directory(&mut ftp_stream, &ftp_connection);
-
-    let files: Vec<String> = read_files_in_directory(&mut ftp_stream);
+    let files: Vec<String> = ftp_stream::read_files_in_directory(ftp_stream);
 
     let provider: &String = &ftp_connection.provider;
     let _ = prepare_provider_directory(provider);
@@ -60,36 +55,7 @@ pub fn download(ftp_connection: FtpConnection) -> Vec<File> {
     downloads
 }
 
-fn connect(ftp_connection: &FtpConnection) -> FtpStream {
-    FtpStream::connect(format!("{}:{}", ftp_connection.host, ftp_connection.port)).unwrap()
-}
-
-fn login(ftp_stream: &mut FtpStream, ftp_connection: &FtpConnection) {
-    match ftp_stream.login(&ftp_connection.username, &ftp_connection.password) {
-        Err(error) => println!("{:?}", error),
-        Ok(()) => println!("Succesfully logged in."),
-    };
-}
-
-fn change_directory(ftp_stream: &mut FtpStream, ftp_connection: &FtpConnection) {
-    match ftp_stream.cwd(&ftp_connection.download_dir) {
-        Err(error) => println!("{:?}", error),
-        Ok(()) => println!("Change to directory: {}", &ftp_connection.download_dir),
-    };
-}
-
-fn read_files_in_directory(ftp_stream: &mut FtpStream) -> Vec<String> {
-    println!("Reading files in folder {}", ftp_stream.pwd().unwrap());
-
-    let files: Vec<String> = match ftp_stream.nlst(Some(".")) {
-        Err(error) => panic!("{:?}", error),
-        Ok(files) => files,
-    };
-
-    files
-}
-
-fn prepare_provider_directory(provider: &str) -> Result<(), Box<dyn Error>> {
+pub fn prepare_provider_directory(provider: &str) -> Result<(), Box<dyn Error>> {
     let dir_exists = Path::new(provider).exists();
 
     if dir_exists {
