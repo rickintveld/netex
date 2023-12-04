@@ -14,5 +14,7 @@ fn main() {
 
     let downloads: Vec<File> = service::file::download(ftp_connection);
 
-    let _ = service::gzip::extract(downloads);
+    let extractions: Vec<File> = service::gzip::extract(downloads);
+
+    println!("{:?}", extractions);
 }

@@ -4,7 +4,9 @@ use std::io::copy;
 use std::path::PathBuf;
 use std::{fs::File, io::BufReader};
 
-pub fn extract(files: Vec<File>) -> std::io::Result<()> {
+pub fn extract(files: Vec<File>) -> Vec<File> {
+    let mut extractions: Vec<File> = vec![];
+
     for file in files {
         let download: PathBuf = match file.path() {
             Err(error) => panic!("Could not get path for file: {:?}: {:?}", file, error),
@@ -31,8 +33,13 @@ pub fn extract(files: Vec<File>) -> std::io::Result<()> {
 
         let mut decoder: bufread::GzDecoder<BufReader<File>> = bufread::GzDecoder::new(gzip);
 
-        copy(&mut decoder, &mut xml).unwrap();
+        let _ = match copy(&mut decoder, &mut xml) {
+            Err(error) => println!("Failed: {:?}", error),
+            Ok(_) => println!("Extraction finished"),
+        };
+
+        extractions.push(xml);
     }
 
-    Ok(())
+    extractions
 }
