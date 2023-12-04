@@ -12,18 +12,13 @@ pub fn download(ftp_connection: FtpConnection) -> Vec<File> {
     let file_regex = Regex::new(&ftp_connection.regex).unwrap();
     let date_regex = Regex::new(r"(\d{8})_(\d{8})").unwrap();
 
-    let mut ftp_stream =
-        FtpStream::connect(format!("{}:{}", ftp_connection.host, ftp_connection.port)).unwrap();
+    let mut ftp_stream = connect(&ftp_connection);
 
-    ftp_stream
-        .login(&ftp_connection.username, &ftp_connection.password)
-        .unwrap();
+    login(&mut ftp_stream, &ftp_connection);
 
-    println!("Change to directory: {}", &ftp_connection.download_dir);
-    ftp_stream.cwd(&ftp_connection.download_dir).unwrap();
+    change_directory(&mut ftp_stream, &ftp_connection);
 
-    println!("Reading files in folder {}", ftp_stream.pwd().unwrap());
-    let files: Vec<String> = ftp_stream.nlst(Some(".")).unwrap();
+    let files: Vec<String> = read_files_in_directory(&mut ftp_stream);
 
     let provider: &String = &ftp_connection.provider;
     let _ = prepare_provider_directory(provider);
@@ -63,6 +58,35 @@ pub fn download(ftp_connection: FtpConnection) -> Vec<File> {
     let _ = ftp_stream.quit();
 
     downloads
+}
+
+fn connect(ftp_connection: &FtpConnection) -> FtpStream {
+    FtpStream::connect(format!("{}:{}", ftp_connection.host, ftp_connection.port)).unwrap()
+}
+
+fn login(ftp_stream: &mut FtpStream, ftp_connection: &FtpConnection) {
+    match ftp_stream.login(&ftp_connection.username, &ftp_connection.password) {
+        Err(error) => println!("{:?}", error),
+        Ok(()) => println!("Succesfully logged in."),
+    };
+}
+
+fn change_directory(ftp_stream: &mut FtpStream, ftp_connection: &FtpConnection) {
+    match ftp_stream.cwd(&ftp_connection.download_dir) {
+        Err(error) => println!("{:?}", error),
+        Ok(()) => println!("Change to directory: {}", &ftp_connection.download_dir),
+    };
+}
+
+fn read_files_in_directory(ftp_stream: &mut FtpStream) -> Vec<String> {
+    println!("Reading files in folder {}", ftp_stream.pwd().unwrap());
+
+    let files: Vec<String> = match ftp_stream.nlst(Some(".")) {
+        Err(error) => panic!("{:?}", error),
+        Ok(files) => files,
+    };
+
+    files
 }
 
 fn prepare_provider_directory(provider: &str) -> Result<(), Box<dyn Error>> {
