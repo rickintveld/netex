@@ -35,10 +35,8 @@ pub fn extract(files: Vec<File>) -> Vec<File> {
 
         let _ = match copy(&mut decoder, &mut xml) {
             Err(error) => println!("Failed: {:?}", error),
-            Ok(_) => println!("Extraction finished"),
+            Ok(_) => extractions.push(xml),
         };
-
-        extractions.push(xml);
     }
 
     extractions
