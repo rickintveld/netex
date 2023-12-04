@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 chrono = "0.4.24"
 dotenvy = "0.15.6"
+filepath = "0.1.2"
 flate2 = "1.0.25"
 ftp = "3.0.1"
 regex = "1.8.0"

@@ -49,7 +49,7 @@ pub fn download(ftp_connection: FtpConnection) -> Vec<File> {
                 let path = format!("{}/{}", &provider, file);
 
                 let mut local_file = match File::create(&path) {
-                    Err(error) => panic!("couldn't create {}: {}", &path, error),
+                    Err(error) => panic!("Could not create {}: {}", &path, error),
                     Ok(file) => file,
                 };
 
