@@ -1,3 +1,5 @@
+use std::fs::File;
+
 use dotenvy::dotenv;
 use types::connection::FtpConnection;
 
@@ -10,7 +12,7 @@ fn main() {
 
     let ftp_connection: FtpConnection = provider::netex::ftp_connection();
 
-    let downloads = service::file::download(ftp_connection);
+    let downloads: Vec<File> = service::file::download(ftp_connection);
 
     let _ = service::gzip::extract(downloads);
 }
