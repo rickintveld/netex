@@ -11,7 +11,7 @@ pub fn extract(files: Vec<File>) -> std::io::Result<()> {
             Ok(download) => download,
         };
 
-        let path = download.display().to_string();
+        let path: String = download.display().to_string();
 
         println!("Extracting: {}", path);
 
@@ -19,9 +19,15 @@ pub fn extract(files: Vec<File>) -> std::io::Result<()> {
             .strip_suffix(".gz")
             .expect("Could not removed suffix GZ");
 
-        let gzip: BufReader<File> = BufReader::new(File::open(&path).unwrap());
+        let gzip: BufReader<File> = match File::open(&path) {
+            Err(error) => panic!("Could not open file {}: {:?}", &path, error),
+            Ok(file) => BufReader::new(file),
+        };
 
-        let mut xml: File = File::create(output_file).unwrap();
+        let mut xml: File = match File::create(output_file) {
+            Err(error) => panic!("{:?}", error),
+            Ok(file) => file,
+        };
 
         let mut decoder: bufread::GzDecoder<BufReader<File>> = bufread::GzDecoder::new(gzip);
 
