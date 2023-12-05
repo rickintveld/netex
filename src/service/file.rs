@@ -6,10 +6,10 @@ use std::fs::{self, File};
 use std::io::{prelude::*, Cursor};
 use std::path::Path;
 
+use crate::ftp::connection::Connection;
 use crate::service::ftp_stream;
-use crate::types::connection::FtpConnection;
 
-pub fn download(ftp_stream: &mut FtpStream, ftp_connection: FtpConnection) -> Vec<File> {
+pub fn download(ftp_stream: &mut FtpStream, ftp_connection: Connection) -> Vec<File> {
     let file_regex = Regex::new(&ftp_connection.regex).unwrap();
     let date_regex = Regex::new(r"(\d{8})_(\d{8})").unwrap();
 

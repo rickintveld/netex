@@ -1,5 +1,5 @@
 #[derive(Debug, PartialEq)]
-pub struct FtpConnection {
+pub struct Connection {
     pub host: String,
     pub username: String,
     pub password: String,

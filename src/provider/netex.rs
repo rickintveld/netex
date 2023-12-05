@@ -1,9 +1,9 @@
 use std::env;
 
-use crate::types::connection::FtpConnection;
+use crate::ftp::connection::Connection;
 
-pub fn ftp_connection() -> FtpConnection {
-    let ftp_connection = FtpConnection {
+pub fn ftp_connection() -> Connection {
+    let ftp_connection = Connection {
         host: env::var("netex.host").expect("Missing netex host"),
         username: env::var("netex.user").expect("Missing netex user"),
         password: env::var("netex.password").expect("Missing netex password"),
